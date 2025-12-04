@@ -22,13 +22,16 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import za.co.sindi.ai.a2a.server.A2AServerError;
 import za.co.sindi.ai.a2a.server.CallContextBuilder;
 import za.co.sindi.ai.a2a.server.requesthandlers.RequestHandler;
 import za.co.sindi.ai.a2a.server.runtime.impl.RESTCallContextBuilder;
 import za.co.sindi.ai.a2a.server.spi.AgentCardInfo;
+import za.co.sindi.ai.a2a.types.AgentCapabilities;
 import za.co.sindi.ai.a2a.types.AgentCard;
 import za.co.sindi.ai.a2a.types.AuthenticatedExtendedCardNotConfiguredError;
 import za.co.sindi.ai.a2a.types.DeleteTaskPushNotificationConfigParams;
@@ -51,7 +54,7 @@ import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
  * @since 14 November 2025
  */
 @ApplicationScoped
-@Path("/")
+@Path("")
 public class RESTHandler {
 
 	private static final int API_VERSION_NUMBER = 1;
@@ -70,13 +73,14 @@ public class RESTHandler {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AgentCard getPublicAgentCard(@Context UriInfo uriInfo) {
 		String requestUrl = uriInfo.getRequestUri().toString();
+		AgentCapabilities capabilities = new AgentCapabilities(true, null, null, null);
 		if (agentCard == null) {
-			agentCardInfo.getPublicAgentCardBuilder().url(requestUrl).preferredTransport(TransportProtocol.HTTP_JSON);
+			agentCardInfo.getPublicAgentCardBuilder().url(requestUrl).capabilities(capabilities).preferredTransport(TransportProtocol.HTTP_JSON);
 			agentCard = agentCardInfo.getPublicAgentCard();
 		}
 		
 		if (extendedAgentCard == null && agentCard != null && agentCard.getSupportsAuthenticatedExtendedCard() != null && agentCard.getSupportsAuthenticatedExtendedCard()) {
-			agentCardInfo.getExtendedAgentCardBuilder().url(requestUrl).preferredTransport(TransportProtocol.HTTP_JSON);
+			agentCardInfo.getExtendedAgentCardBuilder().url(requestUrl).capabilities(capabilities).preferredTransport(TransportProtocol.HTTP_JSON);
 			extendedAgentCard = agentCardInfo.getExtendedAgentCard();
 		}
 		
@@ -109,6 +113,12 @@ public class RESTHandler {
 		
 		CallContextBuilder builder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
 		Publisher<Event> eventPublisher = requestHandler.onMessageSendStream(request.getParams(), builder.build());
+		ResponseBuilder responseBuilder = Response.ok()
+				  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
+				  .header("Cache-Control", "no-cache, no-transform")
+				  .header("Connection", "keep-alive")
+				  .entity(new SSEStreamResponseStreamingOutput(eventPublisher));
+		asyncResponse.resume(responseBuilder.build());
 	}
 	
 	@GET
@@ -142,8 +152,14 @@ public class RESTHandler {
 			@Suspended AsyncResponse asyncResponse,
 			@PathParam("id")String taskId,
 			SubscribeTaskRequest request) {
-		CallContextBuilder builder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
-		Publisher<Event> eventPublisher = requestHandler.onResubmitToTask(new TaskIdParams(taskId), builder.build());
+		CallContextBuilder callContextBuilder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
+		Publisher<Event> eventPublisher = requestHandler.onResubmitToTask(new TaskIdParams(taskId), callContextBuilder.build());
+		ResponseBuilder responseBuilder = Response.ok()
+												  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
+												  .header("Cache-Control", "no-cache, no-transform")
+												  .header("Connection", "keep-alive")
+												  .entity(new SSEStreamResponseStreamingOutput(eventPublisher));
+		asyncResponse.resume(responseBuilder.build());
 	}
 	
 	@POST

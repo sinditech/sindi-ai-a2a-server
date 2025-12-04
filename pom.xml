@@ -68,20 +68,6 @@
 				<version>${project.version}</version>
 			</dependency>
 			
-			<!-- https://mvnrepository.com/artifact/io.github.a2asdk/a2a-java-sdk-common -->
-			<dependency>
-			    <groupId>io.github.a2asdk</groupId>
-			    <artifactId>a2a-java-sdk-common</artifactId>
-			    <version>0.3.0.Beta2</version>
-			</dependency>
-			
-			<!-- https://mvnrepository.com/artifact/io.github.a2asdk/a2a-java-sdk-reference-rest -->
-			<dependency>
-			    <groupId>io.github.a2asdk</groupId>
-			    <artifactId>a2a-java-sdk-reference-rest</artifactId>
-			    <version>0.3.0.Beta2</version>
-			</dependency>
-			
 			<!-- https://mvnrepository.com/artifact/jakarta.platform/jakarta.jakartaee-api -->
 			<dependency>
 				<groupId>jakarta.platform</groupId>

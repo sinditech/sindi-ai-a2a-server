@@ -22,6 +22,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriInfo;
@@ -33,6 +34,7 @@ import za.co.sindi.ai.a2a.server.runtime.impl.RESTCallContextBuilder;
 import za.co.sindi.ai.a2a.server.spi.AgentCardInfo;
 import za.co.sindi.ai.a2a.types.A2AError;
 import za.co.sindi.ai.a2a.types.A2ARequest;
+import za.co.sindi.ai.a2a.types.AgentCapabilities;
 import za.co.sindi.ai.a2a.types.AgentCard;
 import za.co.sindi.ai.a2a.types.AuthenticatedExtendedCardNotConfiguredError;
 import za.co.sindi.ai.a2a.types.CancelTaskRequest;
@@ -76,7 +78,7 @@ import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
  * @since 14 November 2025
  */
 @ApplicationScoped
-@Path("/")
+@Path("")
 public class JSONRPCHandler {
 	
 	private static final Map<Class<? extends A2AError>, Status> STATUS_CODES = new HashMap<>();
@@ -109,7 +111,7 @@ public class JSONRPCHandler {
 	public AgentCard getPublicAgentCard(@Context UriInfo uriInfo) {
 		if (agentCard == null) {
 			String requestUrl = uriInfo.getRequestUri().toString();
-			agentCardInfo.getPublicAgentCardBuilder().url(requestUrl).preferredTransport(TransportProtocol.JSONRPC);
+			agentCardInfo.getPublicAgentCardBuilder().url(requestUrl).capabilities(new AgentCapabilities(true, null, null, null)).preferredTransport(TransportProtocol.JSONRPC);
 			agentCard = agentCardInfo.getPublicAgentCard();
 		}
 		
@@ -200,6 +202,12 @@ public class JSONRPCHandler {
 			}
 			
 			Publisher<Event> eventPublisher = requestHandler.onMessageSendStream(request.getParams(), context);
+			ResponseBuilder responseBuilder = Response.ok()
+					  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
+					  .header("Cache-Control", "no-cache, no-transform")
+					  .header("Connection", "keep-alive")
+					  .entity(new SSEStreamResponseStreamingOutput(request.getId(), eventPublisher));
+			asyncResponse.resume(responseBuilder.build());
 		} catch (A2AServerError exception) {
 			asyncResponse.resume(toResponse(exception));
 		}
@@ -236,6 +244,12 @@ public class JSONRPCHandler {
 		
 		try {
 			Publisher<Event> eventPublisher = requestHandler.onResubmitToTask(request.getParams(), context);
+			ResponseBuilder responseBuilder = Response.ok()
+					  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
+					  .header("Cache-Control", "no-cache, no-transform")
+					  .header("Connection", "keep-alive")
+					  .entity(new SSEStreamResponseStreamingOutput(request.getId(), eventPublisher));
+			asyncResponse.resume(responseBuilder.build());
 		} catch (A2AServerError exception) {
 			asyncResponse.resume(toResponse(exception));
 		}

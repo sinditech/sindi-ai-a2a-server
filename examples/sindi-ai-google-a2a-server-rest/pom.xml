@@ -11,16 +11,19 @@
 	<packaging>war</packaging>
 	
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/io.github.a2asdk/a2a-java-sdk-common -->
 		<dependency>
-		    <groupId>io.github.a2asdk</groupId>
-		    <artifactId>a2a-java-sdk-common</artifactId>
+			<groupId>jakarta.platform</groupId>
+			<artifactId>jakarta.jakartaee-api</artifactId>
+			<scope>provided</scope>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/io.github.a2asdk/a2a-java-sdk-reference-rest -->
 		<dependency>
-		    <groupId>io.github.a2asdk</groupId>
-		    <artifactId>a2a-java-sdk-reference-rest</artifactId>
+			<groupId>za.co.sindi</groupId>
+			<artifactId>sindi-ai-google-a2a-server-runtime-rest-http</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>za.co.sindi</groupId>
+			<artifactId>hello-world-agent</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

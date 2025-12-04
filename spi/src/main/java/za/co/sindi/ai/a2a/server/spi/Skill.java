@@ -58,11 +58,11 @@ public @interface Skill {
 	 * The set of supported input MIME types for this skill, overriding the agent's defaults.
 	 * @return
 	 */
-	String[] inputModes();
+	String[] inputModes() default {};
 	
 	/**
 	 * The set of supported output MIME types for this skill, overriding the agent's defaults.
 	 * @return
 	 */
-	String[] outputModes();
+	String[] outputModes() default {};
 }

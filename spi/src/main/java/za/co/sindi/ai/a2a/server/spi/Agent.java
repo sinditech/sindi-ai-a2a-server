@@ -10,14 +10,15 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import jakarta.inject.Qualifier;
+import jakarta.enterprise.inject.Stereotype;
+import jakarta.enterprise.util.Nonbinding;
 
 
 /**
  * @author Buhake Sindi
  * @since 10 November 2025
  */
-@Qualifier
+@Stereotype
 @Documented
 @Retention(RUNTIME)
 @Target(TYPE)
@@ -64,6 +65,4 @@ public @interface Agent {
 	 * @return
 	 */
 	String[] defaultOutputModes();
-	
-	
 }

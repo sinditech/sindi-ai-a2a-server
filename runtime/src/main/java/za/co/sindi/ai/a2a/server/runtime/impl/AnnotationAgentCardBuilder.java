@@ -44,7 +44,7 @@ public class AnnotationAgentCardBuilder {
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(agentAnnotation.version()), "A human-readable agent version is required on @Agent.");
 			
 			Map<String, AgentSkill> agentSkills = retrieveAgentSkills(clazz);
-			Preconditions.checkState(agentSkills != null && agentSkills.isEmpty(), "No @Skill annotation found in any declared method(s). An agent requires, at least, 1 skill.");
+			Preconditions.checkState(agentSkills != null && !agentSkills.isEmpty(), "No @Skill annotation found in any declared method(s). An agent requires, at least, 1 skill.");
 			
 			builder.name(agentAnnotation.name())
 				   .description(agentAnnotation.description())
@@ -68,6 +68,7 @@ public class AnnotationAgentCardBuilder {
 		Map<String, AgentSkill> skills = new LinkedHashMap<>();
 		for (Method declaredMethod : clazz.getDeclaredMethods()) {
 			Skill skillAnnotation = declaredMethod.getAnnotation(Skill.class);
+			if (skillAnnotation == null) continue;
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(skillAnnotation.name()), "A human-readable agent skill name is required on @Skill.");
 			Preconditions.checkArgument(!Strings.isNullOrEmpty(skillAnnotation.description()), "A human-readable agent skill description is required on @Skill.");
 			Preconditions.checkArgument(skillAnnotation.tags() != null && skillAnnotation.tags().length > 0, "A human-readable agent skill tags is required on @Skill.");

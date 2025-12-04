@@ -18,6 +18,7 @@ import za.co.sindi.ai.a2a.server.runtime.ExtendedAgentCardBuilder;
 import za.co.sindi.ai.a2a.server.runtime.PublicAgentCardBuilder;
 import za.co.sindi.ai.a2a.server.runtime.impl.AnnotationAgentCardBuilder;
 import za.co.sindi.ai.a2a.server.runtime.impl.ExtendedAgentCardBuilderImpl;
+import za.co.sindi.ai.a2a.server.runtime.impl.PublicAgentCardBuilderImpl;
 import za.co.sindi.ai.a2a.server.spi.Agent;
 
 /**
@@ -45,12 +46,18 @@ public class A2AServerExtension implements Extension {
 		afterBeanDiscovery.addBean(new QueueManagerProducer());
 		afterBeanDiscovery.addBean(new TaskStoreProducer());
 		
+		PublicAgentCardBuilder pacb;
+		ExtendedAgentCardBuilder eacb; 
+		
 		if (!detectedAgentClasses.isEmpty()) {
 			Class<?> agentClass = detectedAgentClasses.iterator().next();
-			PublicAgentCardBuilder pacb = AnnotationAgentCardBuilder.createPublicAgentCardBuilder(agentClass);
-			ExtendedAgentCardBuilder eacb = AnnotationAgentCardBuilder.supportsAuthenticatedExtendedCard(agentClass) ? new ExtendedAgentCardBuilderImpl() : null;
-			
-			afterBeanDiscovery.addBean(new AgentCardInfoProducer(pacb, eacb));
+			pacb = AnnotationAgentCardBuilder.createPublicAgentCardBuilder(agentClass);
+			eacb = AnnotationAgentCardBuilder.supportsAuthenticatedExtendedCard(agentClass) ? new ExtendedAgentCardBuilderImpl() : null;
+		} else {
+			pacb = new PublicAgentCardBuilderImpl();
+			eacb = new ExtendedAgentCardBuilderImpl();
 		}
+		
+		afterBeanDiscovery.addBean(new AgentCardInfoProducer(pacb, eacb));
 	}
 }

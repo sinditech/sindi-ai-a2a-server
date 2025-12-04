@@ -7,7 +7,7 @@
 		<artifactId>sindi-ai-google-a2a-server-runtime-rest</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>sindi-ai-google-a2a-server-rest-json-rpc</artifactId>
+	<artifactId>sindi-ai-google-a2a-server-runtime-rest-json-rpc</artifactId>
 
 	<dependencies>
 		<dependency>

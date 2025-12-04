@@ -1,0 +1,108 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>za.co.sindi</groupId>
+		<artifactId>sindi-ai-google-a2a-examples</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>sindi-ai-google-a2a-examples-agents</artifactId>
+	<packaging>pom</packaging>
+	
+    <properties>        
+        <dev.langchain4j.version>1.9.1</dev.langchain4j.version>
+        <dev.langchain4j.community.version>1.9.1-beta17</dev.langchain4j.community.version>
+        <langchain4j.cdi.version>0.0.8-SNAPSHOT</langchain4j.cdi.version>
+    </properties>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>za.co.sindi</groupId>
+				<artifactId>sindi-ai-google-a2a-server-spi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-bom</artifactId>
+                <version>${dev.langchain4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-config</artifactId>
+                <version>${langchain4j.cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-portable-ext</artifactId>
+                <version>${langchain4j.cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j.cdi</groupId>
+                <artifactId>langchain4j-cdi-telemetry</artifactId>
+                <version>${langchain4j.cdi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${dev.langchain4j.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/dev.langchain4j/langchain4j-google-ai-gemini -->
+			<dependency>
+			    <groupId>dev.langchain4j</groupId>
+			    <artifactId>langchain4j-google-ai-gemini</artifactId>
+			    <version>${dev.langchain4j.version}</version>
+			</dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>2.0.17</version>
+                <scope>runtime</scope>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<dependencies>
+        <dependency>
+            <groupId>dev.langchain4j.cdi</groupId>
+            <artifactId>langchain4j-cdi-config</artifactId>
+        </dependency>
+		
+        <dependency>
+            <groupId>dev.langchain4j.cdi</groupId>
+            <artifactId>langchain4j-cdi-portable-ext</artifactId>
+        </dependency>
+		<!--
+		<dependency>
+            <groupId>dev.langchain4j.cdi</groupId>
+            <artifactId>langchain4j-cdi-fault-tolerance</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>dev.langchain4j.cdi</groupId>
+            <artifactId>langchain4j-cdi-telemetry</artifactId>
+        </dependency>
+		-->
+		<!-- langchain4j dependencies -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+        </dependency>
+        
+        <dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-google-ai-gemini</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>za.co.sindi</groupId>
+			<artifactId>sindi-ai-google-a2a-server-spi</artifactId>
+		</dependency>
+	</dependencies>
+	<modules>
+		<module>hello-world-agent</module>
+	</modules>
+</project>
