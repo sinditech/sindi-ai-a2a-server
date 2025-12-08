@@ -65,4 +65,6 @@ public @interface Skill {
 	 * @return
 	 */
 	String[] outputModes() default {};
+	
+	boolean isExtended() default false;
 }

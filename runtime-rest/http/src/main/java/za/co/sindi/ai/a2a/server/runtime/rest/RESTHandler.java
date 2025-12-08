@@ -54,7 +54,7 @@ import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
  * @since 14 November 2025
  */
 @ApplicationScoped
-@Path("")
+@Path("/")
 public class RESTHandler {
 
 	private static final int API_VERSION_NUMBER = 1;
@@ -69,7 +69,7 @@ public class RESTHandler {
 	private volatile AgentCard extendedAgentCard;
 	
 	@GET
-	@Path("/.well-known/agent-card.json")
+	@Path(".well-known/agent-card.json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public AgentCard getPublicAgentCard(@Context UriInfo uriInfo) {
 		String requestUrl = uriInfo.getRequestUri().toString();
@@ -88,7 +88,7 @@ public class RESTHandler {
 	}
 	
 	@POST
-	@Path("/v" + API_VERSION_NUMBER + "/message:send")
+	@Path("v" + API_VERSION_NUMBER + "/message:send")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Kind sendMessage(@Context SecurityContext securityContext,
@@ -100,7 +100,7 @@ public class RESTHandler {
 	}
 	
 	@POST
-	@Path("/v" + API_VERSION_NUMBER + "/message:stream")
+	@Path("v" + API_VERSION_NUMBER + "/message:stream")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	public void sendMessageStream(@Context SecurityContext securityContext,
@@ -122,7 +122,7 @@ public class RESTHandler {
 	}
 	
 	@GET
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Task getTask(@Context SecurityContext securityContext,
 			@Context HttpHeaders httpHeaders,
@@ -132,7 +132,7 @@ public class RESTHandler {
 	}
 	
 	@POST
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}:cancel")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}:cancel")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Task cancelTask(@Context SecurityContext securityContext,
@@ -144,7 +144,7 @@ public class RESTHandler {
 	}
 	
 	@POST
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}:subscribe")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}:subscribe")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.SERVER_SENT_EVENTS)
 	public void resubscribeTask(@Context SecurityContext securityContext,
@@ -163,7 +163,7 @@ public class RESTHandler {
 	}
 	
 	@POST
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public TaskPushNotificationConfig setTaskPushNotificationConfig(@Context SecurityContext securityContext,
@@ -179,7 +179,7 @@ public class RESTHandler {
 	}
 	
 	@GET
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs/{configId}")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs/{configId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public TaskPushNotificationConfig getTaskPushNotificationConfig(@Context SecurityContext securityContext,
 			@Context HttpHeaders httpHeaders,
@@ -190,7 +190,7 @@ public class RESTHandler {
 	}
 	
 	@GET
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<TaskPushNotificationConfig> listTaskPushNotificationConfig(@Context SecurityContext securityContext,
 			@Context HttpHeaders httpHeaders,
@@ -200,7 +200,7 @@ public class RESTHandler {
 	}
 	
 	@DELETE
-	@Path("/v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs/{configId}")
+	@Path("v" + API_VERSION_NUMBER + "/tasks/{id}/pushNotificationConfigs/{configId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void deleteTaskPushNotificationConfig(@Context SecurityContext securityContext,
 			@Context HttpHeaders httpHeaders,
@@ -215,7 +215,7 @@ public class RESTHandler {
 	}
 	
 	@GET
-	@Path("/v" + API_VERSION_NUMBER + "/card")
+	@Path("v" + API_VERSION_NUMBER + "/card")
 	@Produces(MediaType.APPLICATION_JSON)
 	public AgentCard getAuthenticatedExtendedCard(@Context SecurityContext securityContext,
 			@Context UriInfo uriInfo) {

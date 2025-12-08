@@ -16,6 +16,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.microprofile.openapi</groupId>
+			<artifactId>microprofile-openapi-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>za.co.sindi</groupId>
 			<artifactId>sindi-ai-google-a2a-server-runtime</artifactId>
 		</dependency>

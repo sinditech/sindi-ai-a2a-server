@@ -44,6 +44,7 @@
 		<maven.compiler.source>25</maven.compiler.source>
 		<maven.compiler.target>25</maven.compiler.target>
 		<jakartaee-api.version>10.0.0</jakartaee-api.version>
+		<microprofile-openapi-api.version>4.1.1</microprofile-openapi-api.version>
 		<compiler-plugin.version>3.14.0</compiler-plugin.version>
 		<war-plugin.version>3.4.0</war-plugin.version>
 	</properties>
@@ -74,6 +75,14 @@
 				<artifactId>jakarta.jakartaee-api</artifactId>
 				<version>${jakartaee-api.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			
+			<!-- https://mvnrepository.com/artifact/org.eclipse.microprofile.openapi/microprofile-openapi-api -->
+			<dependency>
+			    <groupId>org.eclipse.microprofile.openapi</groupId>
+			    <artifactId>microprofile-openapi-api</artifactId>
+			    <version>${microprofile-openapi-api.version}</version>
+			    <scope>provided</scope>
 			</dependency>
 			
 			<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->

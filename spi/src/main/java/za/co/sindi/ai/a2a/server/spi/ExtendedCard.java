@@ -10,19 +10,16 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import jakarta.enterprise.inject.Stereotype;
-
 
 /**
  * @author Buhake Sindi
  * @since 10 November 2025
  */
-@Stereotype
 @Documented
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface Agent {
-
+public @interface ExtendedCard {
+	
 	/**
 	 * A human-readable name for the agent.
 	 * @return
@@ -36,4 +33,25 @@ public @interface Agent {
 	 * @return
 	 */
 	String description();
+
+	/**
+	 * The agent's own version number. The format is defined by the provider.
+	 * 
+	 * @return
+	 */
+	String version();
+	
+	/**
+	 * Default set of supported input MIME types for all skills, which can be
+	 * overridden on a per-skill basis.
+	 * @return
+	 */
+	String[] defaultInputModes() default {};
+	
+	/**
+	 * Default set of supported output MIME types for all skills, which can be
+	 * overridden on a per-skill basis.
+	 * @return
+	 */
+	String[] defaultOutputModes() default {};
 }

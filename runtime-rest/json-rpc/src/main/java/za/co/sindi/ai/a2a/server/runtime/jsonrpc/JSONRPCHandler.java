@@ -78,7 +78,7 @@ import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
  * @since 14 November 2025
  */
 @ApplicationScoped
-@Path("")
+@Path("/")
 public class JSONRPCHandler {
 	
 	private static final Map<Class<? extends A2AError>, Status> STATUS_CODES = new HashMap<>();
@@ -106,7 +106,7 @@ public class JSONRPCHandler {
 	private volatile AgentCard extendedAgentCard;
 	
 	@GET
-	@Path("/.well-known/agent-card.json")
+	@Path(".well-known/agent-card.json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public AgentCard getPublicAgentCard(@Context UriInfo uriInfo) {
 		if (agentCard == null) {
