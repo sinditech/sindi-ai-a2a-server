@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.ws.rs.core.SecurityContext;
+import za.co.sindi.ai.a2a.extensions.A2AExtensions;
 import za.co.sindi.ai.a2a.server.CallContextBuilder;
 import za.co.sindi.ai.a2a.server.ServerCallContext;
 import za.co.sindi.ai.a2a.server.auth.UnauthenticatedUserPrincipal;
 import za.co.sindi.ai.a2a.server.auth.UserPrincipal;
-import za.co.sindi.ai.a2a.server.extensions.A2AExtensions;
 
 /**
  * @author Buhake Sindi
