@@ -22,6 +22,7 @@ import za.co.sindi.ai.a2a.types.Message;
 import za.co.sindi.ai.a2a.types.Task;
 import za.co.sindi.ai.a2a.types.TaskArtifactUpdateEvent;
 import za.co.sindi.ai.a2a.types.TaskStatusUpdateEvent;
+import za.co.sindi.ai.a2a.types.rest.StreamResponse;
 import za.co.sindi.ai.a2a.utils.JsonUtils;
 
 /**
@@ -39,8 +40,6 @@ public class SSEStreamResponseStreamingOutput implements StreamingOutput {
 		super();
 		this.publisher = Objects.requireNonNull(publisher, "A publisher is required.");
 	}
-
-
 
 	@Override
 	public void write(OutputStream output) throws IOException, WebApplicationException {

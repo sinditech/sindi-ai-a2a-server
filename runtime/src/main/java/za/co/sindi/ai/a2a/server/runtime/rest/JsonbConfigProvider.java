@@ -11,6 +11,7 @@ import jakarta.ws.rs.ext.Provider;
 import za.co.sindi.ai.a2a.utils.json.JsonAPISchemeInAdapter;
 import za.co.sindi.ai.a2a.utils.json.JsonJSONRPCVersionAdapter;
 import za.co.sindi.ai.a2a.utils.json.JsonMessageRoleAdapter;
+import za.co.sindi.ai.a2a.utils.json.JsonRequestIdSerialization;
 import za.co.sindi.ai.a2a.utils.json.JsonTaskStateAdapter;
 import za.co.sindi.ai.a2a.utils.json.JsonTransportProtocolAdapter;
 
@@ -36,7 +37,9 @@ public class JsonbConfigProvider implements ContextResolver<Jsonb> {
 						new JsonJSONRPCVersionAdapter(),
 						new JsonMessageRoleAdapter(),
 						new JsonTaskStateAdapter(),
-						new JsonTransportProtocolAdapter());
+						new JsonTransportProtocolAdapter())
+					.withSerializers(new JsonRequestIdSerialization())
+					.withDeserializers(new JsonRequestIdSerialization());
 		this.jsonb = JsonbBuilder.create(config);
 	}
 

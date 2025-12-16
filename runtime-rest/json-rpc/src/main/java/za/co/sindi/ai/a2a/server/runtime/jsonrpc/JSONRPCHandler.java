@@ -110,8 +110,8 @@ public class JSONRPCHandler {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AgentCard getPublicAgentCard(@Context UriInfo uriInfo) {
 		if (agentCard == null) {
-			String requestUrl = uriInfo.getRequestUri().toString();
-			agentCardInfo.getPublicAgentCardBuilder().url(requestUrl).capabilities(new AgentCapabilities(true, null, null, null)).preferredTransport(TransportProtocol.JSONRPC);
+			String baseUrl = uriInfo.getBaseUri().toString();
+			agentCardInfo.getPublicAgentCardBuilder().url(baseUrl).capabilities(new AgentCapabilities(true, null, null, null)).preferredTransport(TransportProtocol.JSONRPC);
 			agentCard = agentCardInfo.getPublicAgentCard();
 		}
 		
@@ -128,7 +128,7 @@ public class JSONRPCHandler {
 		if(request instanceof JSONRPCRequest jsonRpcRequest) {
 			CallContextBuilder builder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
 			
-			switch(jsonRpcRequest.getMethod()) {
+			switch(jsonRpcRequest.getRequestMethod()) {
 				case SendMessageRequest.DEFAULT_METHOD:
 						sendMessage((SendMessageRequest) request, builder.build(), asyncResponse);
 					break;
