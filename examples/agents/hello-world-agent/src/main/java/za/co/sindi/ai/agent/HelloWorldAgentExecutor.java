@@ -31,6 +31,7 @@ public class HelloWorldAgentExecutor implements AgentExecutor {
 			eventQueue.enqueueEvent(Messages.newAgentTextMessage(result));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
+			Thread.currentThread().interrupt();
 			throw new A2AServerError(new InternalError(e.getLocalizedMessage()));
 		}
 	}

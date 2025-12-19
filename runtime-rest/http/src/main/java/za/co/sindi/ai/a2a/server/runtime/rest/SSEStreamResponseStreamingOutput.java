@@ -82,7 +82,7 @@ public class SSEStreamResponseStreamingOutput implements StreamingOutput {
 
                 @Override
                 public void onComplete() {
-                    latch.countDown(); // Signal completion
+                	latch.countDown(); // Signal completion
                 }
             });
 
