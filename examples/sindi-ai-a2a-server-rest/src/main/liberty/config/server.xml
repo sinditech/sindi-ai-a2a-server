@@ -1,0 +1,34 @@
+<server description="Sample Liberty server">
+    <featureManager>
+    	<feature>jakartaee-10.0</feature>
+    	<feature>microProfile-7.1</feature>
+    </featureManager>
+    
+    <variable name="http.port" defaultValue="9080"/>
+  	<variable name="https.port" defaultValue="9443"/>
+
+  	<httpEndpoint host="*" httpPort="${http.port}" httpsPort="${https.port}" id="defaultHttpEndpoint"/>
+    
+    <webApplication location="${project.name}.war" contextRoot="/" />
+
+    <applicationManager autoExpand="true"/>
+    
+    <!-- 
+    <cors domain="/configurations/simple"
+        allowedOrigins="http://localhost"
+        allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
+        allowCredentials="true"
+        exposeHeaders="Content-Type, Authorization"/>
+
+    <cors domain="/configurations/preflight"
+        allowedOrigins="*"
+        allowedMethods="GET, POST, PUT, DELETE, OPTIONS, HEAD"
+        allowCredentials="true"
+        allowedHeaders="origin, content-type, accept, authorization"
+        maxAge="1209600"/>
+    -->
+    
+    <!--
+    <logging consoleLogLevel="INFO"/>
+    -->
+</server>

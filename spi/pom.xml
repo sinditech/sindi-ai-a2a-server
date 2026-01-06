@@ -29,7 +29,7 @@
 		</dependency>
 		<dependency>
 			<groupId>za.co.sindi</groupId>
-			<artifactId>sindi-ai-a2a</artifactId>
+			<artifactId>sindi-ai-a2a-server-core</artifactId>
 		</dependency>
 	</dependencies>
 </project>
