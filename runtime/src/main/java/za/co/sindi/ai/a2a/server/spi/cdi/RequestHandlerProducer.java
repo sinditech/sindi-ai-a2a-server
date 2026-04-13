@@ -23,7 +23,7 @@ import za.co.sindi.ai.a2a.server.tasks.TaskStore;
  */
 @ApplicationScoped
 public final class RequestHandlerProducer {
-
+	
 	@Inject
 	private AgentExecutor agentExecutor;
 	
@@ -42,8 +42,20 @@ public final class RequestHandlerProducer {
 	@Resource
 	private ManagedExecutorService managedExecutorService;
 	
+	@Inject
+	private Instance<ManagedExecutorService> instanceManagedExecutorService;
+	
 	@Produces
 	public RequestHandler getRequestHandler() {
-		return new DefaultRequestHandler(agentExecutor, taskStore, queueManager, pushConfigStore != null && pushConfigStore.isResolvable() ? pushConfigStore.get() : null, pushSender != null && pushSender.isResolvable() ? pushSender.get() : null, null, managedExecutorService);
+		return new DefaultRequestHandler(agentExecutor, taskStore, queueManager, pushConfigStore != null && pushConfigStore.isResolvable() ? pushConfigStore.get() : null, pushSender != null && pushSender.isResolvable() ? pushSender.get() : null, null, getManagedExecutorService());
+	}
+
+	/**
+	 * @return the managedExecutorService
+	 */
+	public ManagedExecutorService getManagedExecutorService() {
+		if (managedExecutorService != null) return managedExecutorService;
+		if (instanceManagedExecutorService != null && instanceManagedExecutorService.isResolvable()) return instanceManagedExecutorService.get();
+		throw new IllegalStateException("No ManagedExecutorService found, either via @Resource of via CDI injection. Aborting");
 	}
 }

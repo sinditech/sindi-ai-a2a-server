@@ -73,8 +73,14 @@
 		<dependencies>
 			<dependency>
 				<groupId>za.co.sindi</groupId>
+				<artifactId>sindi-commons</artifactId>
+				<version>${project.version}</version><!-- was 0.0.3 -->
+			</dependency>
+			
+			<dependency>
+				<groupId>za.co.sindi</groupId>
 				<artifactId>sindi-ai-a2a-server-core</artifactId>
-				<version>0.0.2</version>
+				<version>${project.version}</version><!-- was 0.0.2 -->
 			</dependency>
 			
 			<dependency>

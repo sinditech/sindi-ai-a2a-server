@@ -5,6 +5,7 @@ package za.co.sindi.ai.a2a.server.runtime.rest;
 
 import java.util.List;
 import java.util.concurrent.Flow.Publisher;
+import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -43,14 +44,18 @@ import za.co.sindi.ai.a2a.types.Message;
 import za.co.sindi.ai.a2a.types.MessageSendParams;
 import za.co.sindi.ai.a2a.types.PushNotificationNotSupportedError;
 import za.co.sindi.ai.a2a.types.Task;
+import za.co.sindi.ai.a2a.types.TaskArtifactUpdateEvent;
 import za.co.sindi.ai.a2a.types.TaskIdParams;
 import za.co.sindi.ai.a2a.types.TaskPushNotificationConfig;
 import za.co.sindi.ai.a2a.types.TaskQueryParams;
+import za.co.sindi.ai.a2a.types.TaskStatusUpdateEvent;
 import za.co.sindi.ai.a2a.types.TransportProtocol;
 import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
 import za.co.sindi.ai.a2a.types.rest.CancelTaskRequest;
 import za.co.sindi.ai.a2a.types.rest.CreateTaskPushNotificationConfigRequest;
 import za.co.sindi.ai.a2a.types.rest.SendMessageResponse;
+import za.co.sindi.ai.a2a.types.rest.StreamResponse;
+import za.co.sindi.commons.concurrent.TransformingPublisher;
 
 /**
  * @author Buhake Sindi
@@ -119,11 +124,12 @@ public class RESTHandler {
 		
 		CallContextBuilder builder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
 		Publisher<Event> eventPublisher = requestHandler.onMessageSendStream(params, builder.build());
+		Publisher<StreamResponse> responsePublisher = new TransformingPublisher<>(eventPublisher, mapper());
 		ResponseBuilder responseBuilder = Response.ok()
 				  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
 				  .header("Cache-Control", "no-cache, no-transform")
 				  .header("Connection", "keep-alive")
-				  .entity(new SSEStreamResponseStreamingOutput(eventPublisher));
+				  .entity(new SSEStreamResponseStreamingOutput(responsePublisher));
 		asyncResponse.resume(responseBuilder.build());
 	}
 	
@@ -160,11 +166,12 @@ public class RESTHandler {
 			SubscribeTaskRequest request) {
 		CallContextBuilder callContextBuilder = new RESTCallContextBuilder(securityContext, httpHeaders.getRequestHeaders());
 		Publisher<Event> eventPublisher = requestHandler.onResubmitToTask(new TaskIdParams(taskId), callContextBuilder.build());
+		Publisher<StreamResponse> responsePublisher = new TransformingPublisher<>(eventPublisher, mapper());
 		ResponseBuilder responseBuilder = Response.ok()
 												  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
 												  .header("Cache-Control", "no-cache, no-transform")
 												  .header("Connection", "keep-alive")
-												  .entity(new SSEStreamResponseStreamingOutput(eventPublisher));
+												  .entity(new SSEStreamResponseStreamingOutput(responsePublisher));
 		asyncResponse.resume(responseBuilder.build());
 	}
 	
@@ -236,5 +243,15 @@ public class RESTHandler {
 		}
 		
 		return extendedAgentCard;
+	}
+	
+	private Function<Event, StreamResponse> mapper() {
+		return (event) -> {
+			if (event instanceof Message message) return new StreamResponse(message);
+        	if (event instanceof Task task) return new StreamResponse(task);
+        	if (event instanceof TaskStatusUpdateEvent statusUpdate) return new StreamResponse(statusUpdate);
+        	if (event instanceof TaskArtifactUpdateEvent artifactUpdate) return new StreamResponse(artifactUpdate);
+        	throw new A2AServerError(new za.co.sindi.ai.a2a.types.InternalError());
+		};
 	}
 }

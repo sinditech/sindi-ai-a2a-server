@@ -10,20 +10,16 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Flow.Publisher;
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.StreamingOutput;
-import za.co.sindi.ai.a2a.types.Event;
-import za.co.sindi.ai.a2a.types.Message;
-import za.co.sindi.ai.a2a.types.RequestId;
+import za.co.sindi.ai.a2a.server.A2AServerError;
 import za.co.sindi.ai.a2a.types.SendStreamingMessageSuccessResponse;
-import za.co.sindi.ai.a2a.types.Task;
-import za.co.sindi.ai.a2a.types.TaskArtifactUpdateEvent;
-import za.co.sindi.ai.a2a.types.TaskStatusUpdateEvent;
 import za.co.sindi.ai.a2a.utils.JsonUtils;
 
 /**
@@ -32,16 +28,14 @@ import za.co.sindi.ai.a2a.utils.JsonUtils;
  */
 public class SSEStreamResponseStreamingOutput implements StreamingOutput {
 
-	private final RequestId id;
-	private final Publisher<Event> publisher;
+	private static final Logger LOGGER = Logger.getLogger(SSEStreamResponseStreamingOutput.class.getName());
+	private final Publisher<SendStreamingMessageSuccessResponse> publisher;
 	
 	/**
-	 * @param id
 	 * @param publisher
 	 */
-	public SSEStreamResponseStreamingOutput(RequestId id, Publisher<Event> publisher) {
+	public SSEStreamResponseStreamingOutput(Publisher<SendStreamingMessageSuccessResponse> publisher) {
 		super();
-		this.id = Objects.requireNonNull(id, "A JSON-RPC Request Id is required.");
 		this.publisher = Objects.requireNonNull(publisher, "A publisher is required.");
 	}
 
@@ -51,55 +45,36 @@ public class SSEStreamResponseStreamingOutput implements StreamingOutput {
 		// Use a BufferedWriter for efficient writing
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
         	// Example using a simple blocking consumer (requires careful backpressure handling in a real app):
-            CountDownLatch latch = new CountDownLatch(1);
-            publisher.subscribe(new Subscriber<Event>() {
-                private Subscription subscription;
+            publisher.subscribe(new Subscriber<>() {
 
                 @Override
-                public void onSubscribe(Subscription s) {
-                    (this.subscription = s).request(Long.MAX_VALUE); // Request all data at once (simple, but potentially problematic for large streams)
-                }
+                public void onSubscribe(Subscription subscription) {}
 
                 @Override
-                public void onNext(Event event) {
+                public void onNext(SendStreamingMessageSuccessResponse response) {
                     try {
-                    	SendStreamingMessageSuccessResponse response = null;
-                    	if (event instanceof Message message) response = new SendStreamingMessageSuccessResponse(id, message);
-                    	else if (event instanceof Task task) response = new SendStreamingMessageSuccessResponse(id, task);
-                    	else if (event instanceof TaskStatusUpdateEvent statusUpdate) response = new SendStreamingMessageSuccessResponse(id, statusUpdate);
-                    	else if (event instanceof TaskArtifactUpdateEvent artifactUpdate) response = new SendStreamingMessageSuccessResponse(id, artifactUpdate);
-                    	
                     	writer.write("data: " + JsonUtils.marshall(response) + "\n\n");
                         writer.flush(); // Flush immediately to ensure data is streamed
                     } catch (IOException e) {
                         onError(e); // Propagate IO errors
                     }
-                    // For manual backpressure, you would call subscription.request(n) here
                 }
 
                 @Override
                 public void onError(Throwable t) {
                     // Handle error (e.g., log it or rethrow as a WebApplicationException)
-                    latch.countDown();
-                    throw new RuntimeException("Error in reactive stream", t);
+                	LOGGER.log(Level.SEVERE, "Error encountered from reactive stream.", t);
+                	if (t instanceof A2AServerError e) throw e;
+                	throw new A2AServerError(new za.co.sindi.ai.a2a.types.InternalError(t.getMessage()));
                 }
 
                 @Override
                 public void onComplete() {
-                    latch.countDown(); // Signal completion
+                	LOGGER.info("Reactive streaming completed.");
                 }
             });
-
-            // Wait for the stream to complete
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new IOException("Streaming interrupted", e);
-            }
         } catch (Exception e) {
             throw new WebApplicationException("Failed to stream data.", e);
         }
 	}
 }
-
