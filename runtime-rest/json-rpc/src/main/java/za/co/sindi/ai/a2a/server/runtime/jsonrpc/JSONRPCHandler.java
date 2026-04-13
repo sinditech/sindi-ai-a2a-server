@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Flow.Publisher;
+import java.util.function.Function;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -59,19 +60,25 @@ import za.co.sindi.ai.a2a.types.Kind;
 import za.co.sindi.ai.a2a.types.ListTaskPushNotificationConfigRequest;
 import za.co.sindi.ai.a2a.types.ListTaskPushNotificationConfigSuccessResponse;
 import za.co.sindi.ai.a2a.types.ListTasksRequest;
+import za.co.sindi.ai.a2a.types.Message;
 import za.co.sindi.ai.a2a.types.MethodNotFoundError;
 import za.co.sindi.ai.a2a.types.PushNotificationNotSupportedError;
+import za.co.sindi.ai.a2a.types.RequestId;
 import za.co.sindi.ai.a2a.types.SendMessageRequest;
 import za.co.sindi.ai.a2a.types.SendMessageSuccessResponse;
 import za.co.sindi.ai.a2a.types.SendStreamingMessageRequest;
+import za.co.sindi.ai.a2a.types.SendStreamingMessageSuccessResponse;
 import za.co.sindi.ai.a2a.types.SetTaskPushNotificationConfigRequest;
 import za.co.sindi.ai.a2a.types.SetTaskPushNotificationConfigSuccessResponse;
 import za.co.sindi.ai.a2a.types.Task;
+import za.co.sindi.ai.a2a.types.TaskArtifactUpdateEvent;
 import za.co.sindi.ai.a2a.types.TaskNotFoundError;
 import za.co.sindi.ai.a2a.types.TaskPushNotificationConfig;
 import za.co.sindi.ai.a2a.types.TaskResubscriptionRequest;
+import za.co.sindi.ai.a2a.types.TaskStatusUpdateEvent;
 import za.co.sindi.ai.a2a.types.TransportProtocol;
 import za.co.sindi.ai.a2a.types.UnsupportedOperationError;
+import za.co.sindi.commons.concurrent.TransformingPublisher;
 
 /**
  * @author Buhake Sindi
@@ -183,6 +190,16 @@ public class JSONRPCHandler {
 		return Response.status(status).entity(error).type(MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
+	private Function<Event, SendStreamingMessageSuccessResponse> mapper(final RequestId id) {
+		return (event) -> {
+			if (event instanceof Message message) return new SendStreamingMessageSuccessResponse(id, message);
+	    	else if (event instanceof Task task) return new SendStreamingMessageSuccessResponse(id, task);
+	    	else if (event instanceof TaskStatusUpdateEvent statusUpdate) return new SendStreamingMessageSuccessResponse(id, statusUpdate);
+	    	else if (event instanceof TaskArtifactUpdateEvent artifactUpdate) return new SendStreamingMessageSuccessResponse(id, artifactUpdate);
+	    	throw new A2AServerError(new za.co.sindi.ai.a2a.types.InternalError());
+		};
+	}
+	
 	private void sendMessage(final SendMessageRequest request, final ServerCallContext context, final AsyncResponse asyncResponse) {
 		
 		try {
@@ -202,11 +219,12 @@ public class JSONRPCHandler {
 			}
 			
 			Publisher<Event> eventPublisher = requestHandler.onMessageSendStream(request.getParams(), context);
+			Publisher<SendStreamingMessageSuccessResponse> responsePublisher = new TransformingPublisher<>(eventPublisher, mapper(request.getId()));
 			ResponseBuilder responseBuilder = Response.ok()
 					  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
 					  .header("Cache-Control", "no-cache, no-transform")
 					  .header("Connection", "keep-alive")
-					  .entity(new SSEStreamResponseStreamingOutput(request.getId(), eventPublisher));
+					  .entity(new SSEStreamResponseStreamingOutput(responsePublisher));
 			asyncResponse.resume(responseBuilder.build());
 		} catch (A2AServerError exception) {
 			asyncResponse.resume(toResponse(exception));
@@ -244,11 +262,12 @@ public class JSONRPCHandler {
 		
 		try {
 			Publisher<Event> eventPublisher = requestHandler.onResubmitToTask(request.getParams(), context);
+			Publisher<SendStreamingMessageSuccessResponse> responsePublisher = new TransformingPublisher<>(eventPublisher, mapper(request.getId()));
 			ResponseBuilder responseBuilder = Response.ok()
 					  .type(MediaType.SERVER_SENT_EVENTS_TYPE)
 					  .header("Cache-Control", "no-cache, no-transform")
 					  .header("Connection", "keep-alive")
-					  .entity(new SSEStreamResponseStreamingOutput(request.getId(), eventPublisher));
+					  .entity(new SSEStreamResponseStreamingOutput(responsePublisher));
 			asyncResponse.resume(responseBuilder.build());
 		} catch (A2AServerError exception) {
 			asyncResponse.resume(toResponse(exception));
